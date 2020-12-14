@@ -7,12 +7,19 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+#import dataset
 library(readr)
 Byssinosis <- read_csv("Byssinosis.csv")
-View(Byssinosis)
 
-12345
+#create training set
+train = Byssinosis %>% sample_frac(0.8)
 
+#create testing set
+test = Byssinosis %>% setdiff(train)
 
-123123213132
+#create response variable
+response = cbind(Byssinosis$Byssinosis, Byssinosis$`Non-Byssinosis`)
+glm(response ~. , data = Byssinosis, family = binomial())
 ```
+
