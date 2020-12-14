@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 Byssinosis <- read_csv("Byssinosis.csv")
 
+set.seed(123)
 #create training set
 train = Byssinosis %>% sample_frac(0.8)
 
@@ -70,3 +71,21 @@ both_BIC
 ```
 
 Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking
+
+
+```{r}
+Byssinosis1 <- aggregate(response_test ~ Workspace + Smoking + Employment + Workspace:Smoking + Workspace:Employment,FUN = sum, data = test)
+
+fitGrouped <- glm(cbind(V1,V2)~Workspace + Smoking + Employment + Workspace:Smoking + Workspace:Employment, binomial, Byssinosis1)
+summary(fitGrouped)
+
+1-pchisq(0.196,2)
+
+
+Byssinosis2 <- aggregate(response_test ~ Workspace + Smoking + Employment + Workspace:Smoking,FUN = sum, data = test)
+
+fitGrouped <- glm(cbind(V1,V2)~Workspace + Smoking + Employment + Workspace:Smoking, binomial, Byssinosis2)
+summary(fitGrouped)
+
+1-pchisq(0.26609,3)
+```
