@@ -16,7 +16,7 @@ Byssinosis$Workspace <- as.factor(Byssinosis$Workspace)
 
 library(ISLR)
 attach(Byssinosis)
-smp_siz = floor(0.8*nrow(Byssinosis))
+smp_siz = floor(0.75*nrow(Byssinosis))
 
 set.seed(123)  
 train_ind = sample(seq_len(nrow(Byssinosis)),size = smp_siz)  
@@ -77,26 +77,30 @@ Final Model: response_train ~ Workspace + Smoking + Employment
 
 
 ```{r}
-Byssinosis1 <- aggregate(response_test ~ Workspace + Smoking + Employment + Workspace:Smoking,FUN = sum, data = test)
+Byssinosis1 <- aggregate(response_test ~ Workspace + Smoking + Employment+ Workspace:Smoking,FUN = sum, data = test)
 
-fitGrouped <- glm(cbind(V1,V2)~Workspace + Smoking + Employment + Workspace:Smoking, binomial, Byssinosis1)
+fitGrouped <- glm(cbind(V1,V2) ~ Workspace + Smoking + Employment + Workspace:Smoking, binomial, Byssinosis1)
 summary(fitGrouped)
 
-1-pchisq(0.18839,1)
-
+1-pchisq(0.18839, 2)
 ```
 
 ```{r}
 Byssinosis2 <- aggregate(response_test ~ Workspace + Smoking + Employment,FUN = sum, data = test)
 
-fitGrouped <- glm(cbind(V1,V2)~Workspace + Smoking + Employment, binomial, Byssinosis2)
-summary(fitGrouped)
+fitGrouped2 <- glm(cbind(V1,V2)~Workspace + Smoking + Employment, binomial, Byssinosis2)
+summary(fitGrouped2)
 
-1-pchisq(0.99412,3)
-
-
+1-pchisq(0.63761, 4)
 ```
 
+
+```{r}
+ry <- residuals(fitGrouped2, type = "deviance")
+rx <- fitted.values(fitGrouped2)
+rxy <- cbind (fitted = rx, residual = ry)
+plot(rxy)
+```
 
 
 
