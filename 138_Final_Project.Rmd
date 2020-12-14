@@ -5,6 +5,7 @@ date: "12/14/2020"
 output: pdf_document
 ---
 
+# Import & Modifying Dataset
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -18,8 +19,38 @@ train = Byssinosis %>% sample_frac(0.8)
 #create testing set
 test = Byssinosis %>% setdiff(train)
 
-#create response variable
-response = cbind(Byssinosis$Byssinosis, Byssinosis$`Non-Byssinosis`)
-glm(response ~. , data = Byssinosis, family = binomial())
+#create response variable for train
+response_train = cbind(train$Byssinosis, train$`Non-Byssinosis`)
+
+#create response variable for test
+response_test = cbind(test$Byssinosis, test$`Non-Byssinosis`)
+
+```
+
+# Variable Selection
+
+## Using Forward AIC
+```{r}
+forward_AIC <- step(glm(response_train~1, binomial, train),
+     scope = ~Employment*Smoking*Sex*Race*Workspace,
+     direction = "forward")
+forward_AIC
+```
+
+Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking + Workspace:Employment
+
+## Using Both AIC
+```{r}
+both_AIC <- step(glm(response_train~1, binomial, train),
+     scope = ~Employment*Smoking*Sex*Race*Workspace,
+     direction = "both")
+both_AIC
+```
+
+Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking + Workspace:Employment
+
+## USing Forward BIC
+```{r}
+
 ```
 
