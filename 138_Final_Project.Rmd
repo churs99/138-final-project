@@ -12,13 +12,16 @@ knitr::opts_chunk$set(echo = TRUE)
 #import dataset
 library(readr)
 Byssinosis <- read_csv("Byssinosis.csv")
+Byssinosis$Workspace <- as.factor(Byssinosis$Workspace)
 
-set.seed(123)
-#create training set
-train = Byssinosis %>% sample_frac(0.8)
+library(ISLR)
+attach(Byssinosis)
+smp_siz = floor(0.8*nrow(Byssinosis))
 
-#create testing set
-test = Byssinosis %>% setdiff(train)
+set.seed(123)  
+train_ind = sample(seq_len(nrow(Byssinosis)),size = smp_siz)  
+train =Byssinosis[train_ind,] 
+test=Byssinosis[-train_ind,]
 
 #create response variable for train
 response_train = cbind(train$Byssinosis, train$`Non-Byssinosis`)
@@ -38,7 +41,7 @@ forward_AIC <- step(glm(response_train~1, binomial, train),
 forward_AIC
 ```
 
-Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking + Workspace:Employment
+Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking
 
 ## Using Both AIC
 ```{r}
@@ -48,7 +51,7 @@ both_AIC <- step(glm(response_train~1, binomial, train),
 both_AIC
 ```
 
-Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking + Workspace:Employment
+Final Model:  response_train ~ Workspace + Smoking + Employment + Workspace:Smoking
 
 ## USing Forward BIC
 ```{r}
@@ -59,7 +62,7 @@ forward_BIC <- step(glm(response_train~1, binomial, train),
 forward_BIC
 ```
 
-Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking
+Final Model: formula = response_train ~ Workspace + Smoking + Employment
 
 ## Using Both BIC
 ```{r}
@@ -70,22 +73,31 @@ both_BIC <- step(glm(response_train~1, binomial, train),
 both_BIC
 ```
 
-Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking
+Final Model: response_train ~ Workspace + Smoking + Employment
 
 
 ```{r}
-Byssinosis1 <- aggregate(response_test ~ Workspace + Smoking + Employment + Workspace:Smoking + Workspace:Employment,FUN = sum, data = test)
+Byssinosis1 <- aggregate(response_test ~ Workspace + Smoking + Employment + Workspace:Smoking,FUN = sum, data = test)
 
-fitGrouped <- glm(cbind(V1,V2)~Workspace + Smoking + Employment + Workspace:Smoking + Workspace:Employment, binomial, Byssinosis1)
+fitGrouped <- glm(cbind(V1,V2)~Workspace + Smoking + Employment + Workspace:Smoking, binomial, Byssinosis1)
 summary(fitGrouped)
 
-1-pchisq(0.196,2)
+1-pchisq(0.18839,1)
 
-
-Byssinosis2 <- aggregate(response_test ~ Workspace + Smoking + Employment + Workspace:Smoking,FUN = sum, data = test)
-
-fitGrouped <- glm(cbind(V1,V2)~Workspace + Smoking + Employment + Workspace:Smoking, binomial, Byssinosis2)
-summary(fitGrouped)
-
-1-pchisq(0.26609,3)
 ```
+
+```{r}
+Byssinosis2 <- aggregate(response_test ~ Workspace + Smoking + Employment,FUN = sum, data = test)
+
+fitGrouped <- glm(cbind(V1,V2)~Workspace + Smoking + Employment, binomial, Byssinosis2)
+summary(fitGrouped)
+
+1-pchisq(0.99412,3)
+
+
+```
+
+
+
+
+
