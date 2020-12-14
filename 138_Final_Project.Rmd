@@ -51,6 +51,22 @@ Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoki
 
 ## USing Forward BIC
 ```{r}
-
+forward_BIC <- step(glm(response_train~1, binomial, train),
+     scope = ~Employment*Smoking*Sex*Race*Workspace,
+     direction = "forward",
+     k = log(dim(train)[1]))
+forward_BIC
 ```
 
+Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking
+
+## Using Both BIC
+```{r}
+both_BIC <- step(glm(response_train~1, binomial, train),
+     scope = ~Employment*Smoking*Sex*Race*Workspace,
+     direction = "both",
+     k = log(dim(train)[1]))
+both_BIC
+```
+
+Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking
