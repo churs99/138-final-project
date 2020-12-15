@@ -15,6 +15,7 @@ Byssinosis <- read_csv("Byssinosis.csv")
 Byssinosis$Workspace <- as.factor(Byssinosis$Workspace)
 
 library(ISLR)
+library(ggplot2)
 attach(Byssinosis)
 smp_siz = floor(0.75*nrow(Byssinosis))
 
@@ -29,6 +30,9 @@ response_train = cbind(train$Byssinosis, train$`Non-Byssinosis`)
 #create response variable for test
 response_test = cbind(test$Byssinosis, test$`Non-Byssinosis`)
 ```
+## Exploratory Data Analysis
+
+
 
 # Variable Selection
 
