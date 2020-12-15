@@ -28,30 +28,10 @@ response_train = cbind(train$Byssinosis, train$`Non-Byssinosis`)
 
 #create response variable for test
 response_test = cbind(test$Byssinosis, test$`Non-Byssinosis`)
-
 ```
 
 # Variable Selection
 
-## Using Forward AIC
-```{r}
-forward_AIC <- step(glm(response_train~1, binomial, train),
-     scope = ~Employment*Smoking*Sex*Race*Workspace,
-     direction = "forward")
-forward_AIC
-```
-
-Final Model: response_train ~ Workspace + Smoking + Employment + Workspace:Smoking
-
-## Using Both AIC
-```{r}
-both_AIC <- step(glm(response_train~1, binomial, train),
-     scope = ~Employment*Smoking*Sex*Race*Workspace,
-     direction = "both")
-both_AIC
-```
-
-Final Model:  response_train ~ Workspace + Smoking + Employment + Workspace:Smoking
 
 ## USing Forward BIC
 ```{r}
@@ -77,30 +57,30 @@ Final Model: response_train ~ Workspace + Smoking + Employment
 
 
 ```{r}
-Byssinosis1 <- aggregate(response_test ~ Workspace + Smoking + Employment+ Workspace:Smoking,FUN = sum, data = test)
+Byssinosis1 <- aggregate(response_test ~ Workspace + Smoking + Employment,FUN = sum, data = test)
 
-fitGrouped <- glm(cbind(V1,V2) ~ Workspace + Smoking + Employment + Workspace:Smoking, binomial, Byssinosis1)
+fitGrouped <- glm(cbind(V1,V2) ~ Workspace + Smoking + Employment, binomial, Byssinosis1)
 summary(fitGrouped)
-
-1-pchisq(0.18839, 2)
-```
-
-```{r}
-Byssinosis2 <- aggregate(response_test ~ Workspace + Smoking + Employment,FUN = sum, data = test)
-
-fitGrouped2 <- glm(cbind(V1,V2)~Workspace + Smoking + Employment, binomial, Byssinosis2)
-summary(fitGrouped2)
 
 1-pchisq(0.63761, 4)
 ```
 
-
 ```{r}
-ry <- residuals(fitGrouped2, type = "deviance")
-rx <- fitted.values(fitGrouped2)
-rxy <- cbind (fitted = rx, residual = ry)
-plot(rxy)
+Byssinosis2 <- aggregate(response_test ~ Workspace + Smoking + Employment +Workspace:Smoking + Workspace:Employment + Smoking:Employment,FUN = sum, data = test)
+
+fitGrouped2 <- glm(cbind(V1,V2)~Workspace + Smoking + Employment +Workspace:Smoking + Workspace:Employment + Smoking:Employment, binomial, Byssinosis2)
+summary(fitGrouped2)
+
+1-pchisq(5.1934e-10, 0)
 ```
+
+
+
+
+
+
+
+
 
 
 
