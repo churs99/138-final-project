@@ -1,5 +1,5 @@
 ---
-title: "STA_138_Final_Project"
+title: "STA138 Final Project"
 author: "Edwin Que, Charles Chien"
 date: "12/14/2020"
 output: pdf_document
@@ -61,12 +61,29 @@ longdataeda$y <- ifelse(longdata$y==1,"Yes","No")
 names(longdataeda)[names(longdataeda) == "y"] <- "Byssinosis"
 ```
 
-# 2. Exploratory Data Analysis
+# 2. Exploratory Data Analysis, Pearson's Chi-Square Test of Independence, Likelihood Ratio Test 
 
-Here, we would establish preliminary assumptions on variable effects, and validate them afterwards with proper tests.
+Here, we would establish preliminary assumptions on variable effects from ggplots, and validate them afterwards with proper tests such as Pearson's Chi-Square Test of Independence and the Likelihood Ratio Test.
 
 ## 2.1 Employment
 
+```{r, echo = FALSE}
+#Visualization
+ggplot(longdataeda, aes(x= Employment, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Employment Years", title = "Distribution of Byssinosis by Employment Years")
+
+#Make Table
+O1 <- table(longdataeda$Employment,longdataeda$Byssinosis);O1
+E1 <- rowSums(O1)%*%t(colSums(O1))/sum(O1)
+
+#Pearson's chisq test of independence
+pearsonStatistic1 <- sum((O1-E1)^2/E1)
+pearsonpVal1 <- 1-pchisq(pearsonStatistic1,2)
+
+#Likelihood Ratio Test
+LRstatistic1 <- -2*sum(O1*log(E1/O1))
+LrpVal1 <- 1-pchisq(LRstatistic1,2)
+```
 From our results, it seem like the proportion of having byssinosis is roughly the same across all employment years, with >=20 being the highest and <10 the lowest. 
 
 * $P(Byssinosis|<10) = 63/(2666+63) = 0.02308538$
@@ -75,14 +92,33 @@ From our results, it seem like the proportion of having byssinosis is roughly th
 
 * $P(Byssinosis|10-19) = 26/(26+686) = 0.03651685$
 
-```{r, echo = FALSE}
-ggplot(longdataeda, aes(x= Employment, fill = Byssinosis)) + geom_bar(position = position_dodge())+
-  labs(y= "Number of Workers", x="Employment Years", title = "Distribution of Byssinosis by Employment Years")
+After conducting  Pearson's chi squared test of independence and the likelihood ratio test, we have obtained the following p values: 
 
-table(longdataeda$Employment,longdataeda$Byssinosis)
-```
+* Pearson's p-value: `r pearsonpVal1`
+
+* Likelihood Ratio Test p-value: `r LrpVal1`
+
+At 5% significance level, we reject the null hypothesis for both Pearson's chi squared test of independence as well as likelihood ratio test. There is sufficient evidence to conclude definitively that there is an effect of employment on byssinosis. 
 
 ## 2.2 Smoking
+
+```{r, echo = FALSE}
+#Visualization
+ggplot(longdataeda, aes(x= Smoking, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Smoking", title = "Distribution of Byssinosis by Smoking")
+
+#Make Table
+O2 <- table(longdataeda$Smoking,longdataeda$Byssinosis);O2
+E2 <- rowSums(O2)%*%t(colSums(O2))/sum(O2)
+
+#Pearson's chisq test of independence
+pearsonStatistic2 <- sum((O2-E2)^2/E2)
+pearsonpVal2 <- 1-pchisq(pearsonStatistic2,1)
+
+#Likelihood Ratio Test
+LRstatistic2 <- -2*sum(O2*log(E2/O2))
+LrpVal2 <- 1-pchisq(LRstatistic2,1)
+```
 
 From our results, it seem like the proportion of having byssinosis is higher for smokers than for nonsmokers.
 
@@ -90,42 +126,100 @@ From our results, it seem like the proportion of having byssinosis is higher for
 
 * $P(Byssinosis|Smokers) = 125/(125+3064) = 0.03919724$
 
-```{r, echo = FALSE}
-ggplot(longdataeda, aes(x= Smoking, fill = Byssinosis)) + geom_bar(position = position_dodge())+
-  labs(y= "Number of Workers", x="Smoking", title = "Distribution of Byssinosis by Smoking")
+After conducting  Pearson's chi squared test of independence and the likelihood ratio test, we have obtained the following p values: 
 
-table(longdataeda$Smoking,longdataeda$Byssinosis)
-```
+* Pearson's p-value: `r pearsonpVal2`
+
+* Likelihood Ratio Test p-value: `r LrpVal2`
+
+At 5% significance level, we reject the null hypothesis for both Pearson's chi squared test of independence as well as likelihood ratio test. There is sufficient evidence to conclude definitively that there is an effect of smoking on byssinosis.
 
 ## 2.3 Sex
+
+```{r, echo = FALSE}
+#Visualization
+ggplot(longdataeda, aes(x= Sex, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Sex", title = "Distribution of Byssinosis by Sex")
+
+#Make Table
+O3 <- table(longdataeda$Sex,longdataeda$Byssinosis);O3
+E3 <- rowSums(O3)%*%t(colSums(O3))/sum(O3)
+
+#Pearson's chisq test of independence
+pearsonStatistic3 <- sum((O3-E3)^2/E3)
+pearsonpVal3 <- 1-pchisq(pearsonStatistic3,1)
+
+#Likelihood Ratio Test
+LRstatistic3 <- -2*sum(O3*log(E3/O3))
+LrpVal3 <- 1-pchisq(LRstatistic3,1)
+```
 
 From our results, it seem like the proportion of having byssinosis is higher for male than for female.
 
 * $P(Byssinosis|Female) = 37/(2466+37) = 0.01478226$
 * $P(Byssinosis|Male) = 128/(2788+128) = 0.04389575$
 
-```{r, echo = FALSE}
-ggplot(longdataeda, aes(x= Sex, fill = Byssinosis)) + geom_bar(position = position_dodge())+
-  labs(y= "Number of Workers", x="Sex", title = "Distribution of Byssinosis by Sex")
+After conducting  Pearson's chi squared test of independence and the likelihood ratio test, we have obtained the following p values: 
 
-table(longdataeda$Sex,longdataeda$Byssinosis)
-```
+* Pearson's p-value: `r pearsonpVal3`
+
+* Likelihood Ratio Test p-value: `r LrpVal3`
+
+At 5% significance level, we reject the null hypothesis for both Pearson's chi squared test of independence as well as likelihood ratio test. There is sufficient evidence to conclude definitively that there is an effect of sex on byssinosis.
 
 ## 2.4 Race
+
+```{r, echo = FALSE}
+#Visualization
+ggplot(longdataeda, aes(x= Race, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Race", title = "Distribution of Byssinosis by Race")
+
+#Make Table
+O4 <- table(longdataeda$Race,longdataeda$Byssinosis);O4
+E4 <- rowSums(O4)%*%t(colSums(O4))/sum(O4)
+
+#Pearson's chisq test of independence
+pearsonStatistic4 <- sum((O4-E4)^2/E4)
+pearsonpVal4 <- 1-pchisq(pearsonStatistic4,1)
+
+#Likelihood Ratio Test
+LRstatistic4 <- -2*sum(O4*log(E4/O4))
+LrpVal4 <- 1-pchisq(LRstatistic4,1)
+```
 
 From our results, it seem like the proportion of having byssinosis is slightly higher for other races than white people.
 
 * $P(Byssinosis|OtherRace) = 73/(1830+73) = 0.03836048$
 * $P(Byssinosis|White) = 92/(3424+92) = 0.0261661$
 
-```{r, echo = FALSE}
-ggplot(longdataeda, aes(x= Race, fill = Byssinosis)) + geom_bar(position = position_dodge())+
-  labs(y= "Number of Workers", x="Race", title = "Distribution of Byssinosis by Race")
+After conducting  Pearson's chi squared test of independence and the likelihood ratio test, we have obtained the following p values: 
 
-table(longdataeda$Race,longdataeda$Byssinosis)
-```
+* Pearson's p-value: `r pearsonpVal4`
+
+* Likelihood Ratio Test p-value: `r LrpVal4`
+
+At 5% significance level, we reject the null hypothesis for both Pearson's chi squared test of independence as well as likelihood ratio test. There is sufficient evidence to conclude definitively that there is an effect of race on byssinosis.
+
 
 ## 2.5 Workspace
+
+```{r, echo = FALSE}
+#Visualization
+ggplot(longdataeda, aes(x= Workspace, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Workspace", title = "Distribution of Byssinosis by Workspace")
+
+#Make Table
+O5 <- table(longdataeda$Workspace,longdataeda$Byssinosis);O5
+E5 <- rowSums(O5)%*%t(colSums(O5))/sum(O5)
+
+#Pearson's chisq test of independence
+pearsonStatistic5 <- sum((O5-E5)^2/E5)
+pearsonpVal5 <- 1-pchisq(pearsonStatistic5,2)
+
+#Likelihood Ratio Test
+LRstatistic5 <- -2*sum(O5*log(E5/O5))
+LrpVal5 <- 1-pchisq(LRstatistic5,2)
+```
 
 From our results, it seem like the proportion of having byssinosis is the significantly higher where the workspace is the most dusty. 
 
@@ -133,14 +227,17 @@ From our results, it seem like the proportion of having byssinosis is the signif
 * $P(Byssinosis|LessDusty) = 18/(1282+18) = 0.01384615$
 * $P(Byssinosis|LeastDusty) = 42/(3408+42) = 0.01217391$
 
-```{r, echo = FALSE}
-ggplot(longdataeda, aes(x= Workspace, fill = Byssinosis)) + geom_bar(position = position_dodge())+
-  labs(y= "Number of Workers", x="Workspace", title = "Distribution of Byssinosis by Workspace")
+After conducting  Pearson's chi squared test of independence and the likelihood ratio test, we have obtained the following p values: 
 
-table(longdataeda$Workspace,longdataeda$Byssinosis)
-```
+* Pearson's p-value: `r pearsonpVal5`
 
-Overall, from the exploratory data analysis, 3 factors appear to contribute to having Byssinosis, particularly:
+* Likelihood Ratio Test p-value: `r LrpVal5`
+
+At 5% significance level, we reject the null hypothesis for both Pearson's chi squared test of independence as well as likelihood ratio test. There is sufficient evidence to conclude definitively that there is an effect of workspace on byssinosis.
+
+## 2.6 Observations 
+
+Overall, from the exploratory data analysis and subjectively speaking, 3 factors appear to contribute to having Byssinosis, particularly:
 
 1. Smoking
 
@@ -148,9 +245,11 @@ Overall, from the exploratory data analysis, 3 factors appear to contribute to h
 
 3. Most Dusty Workspace
 
+However, from our Pearson's test and Likelihood Ratio Tests, we have somehow concluded that all the provided variables have a significant effect on byssinosis at 5% significance level. 
+
 Now, we will build a logistic regression model and evaluate these variables to test our hypothesis and observations. 
 
-# 3. Variable Selection
+# 3. Variable Selection, Logistic Model
 
 Here, since our main goal is to build a logistic model focusing on investigating relationships and inference, we choose to use BIC over AIC as our criteria since it is easier for interpretations. AIC is more complicated and is only better if we want a better prediction result. 
 
@@ -178,23 +277,37 @@ summary(both_BIC)
 
 Here, we see that both bidirectional and forward stepwise selection with BIC yielded the same model with workspace as the only input variable. 
 
+To briefly interpret the model and the estimates, here workspace1 would be our baseline case. 
+
+All other things equal, the estimated log-odds for workspace1 according to this model are just the intercept alpha hat, which corresponds to estimated odds of 0.1768, and estimated probablity of 0.15 of having byssinosis for a person working at the most dusty workspace, holding everything else constant. 
+
+All other things equal, the estimated log-odds ratio of having byssinosis for workspace1 vs. workspace2 is Beta1 hat. Thus, estimated odds of having byssinosis under this model are 0.0516 times those of workspace1, holding everything else constant. 
+
+All other things equal, The estimated log-odds ratio of having byssinosis for workspace1 vs. workspace3 is Beta2 hat. Thus, estimated odds of having byssinosis under this model are 0.0809 time those of workspace1, holding everything else constant. 
+
+So, this model suggests that people working in the most dusty workspace are more likely to have byssinosis. 
+
 ## 3.3 Testing for nonzero coefficients 
 
 Now, we want to test this on the test dataset (50% of the original) that we separated out at the beginning.
 
 ```{r, echo = FALSE}
-testFit <- glm(both_BIC$model, binomial, test)
+testFit <- glm(both_BIC$model, quasibinomial, test)
 summary(testFit)
-1-pchisq(608.03, 2706)
+dev <- 1-pchisq(608.03, 2706)
 ```
 
-Using the Wald test with the test dataset, We see that the p values are close to zero, meaning that they are very significant and non zero. To briefly interpret the estimates, the magnitude of the estimates suggest the chance of having Byssinosis decreases less in workspace 1 (most dusty) than in workspaces 2 and 3 (less and least dusty.)
+Using the Wald test with the test dataset, We see that the p values are close to zero, meaning that they are very significant and non zero. 
 
-Additionally, we have conducted a deviance of goodness of fit test to examine the quality of our model. From the p value that we have obtained which is 1, we know that we have rejected the null hypothesis and the model we have developed is quite robust. 
+Additionally, we have conducted a deviance of goodness of fit test to examine the quality of our model. From the p value that we have obtained which is `r dev`, we know that we have rejected the null hypothesis and the model we have developed is quite robust. Our dispersion parameter that is 1.00 also shows that our model doesn't suffer from overdispersion.
 
 # 4. Conclusion
 
-From our result, the only factor that contributed significantly to byssinosis is the presence of dust. Workspace which are the most dusty contribute more as compared to the other ones.  
+At the beginning, we have subjectively assumed that smoking, being a male, and being in the most dusty workspace contribute the most to byssinosis from the table and plots we have observed. 
+
+After conducting both the Pearson's Chi-Squared Test of Independence and the Likelihood Ratio Test, we have observed some dependencies between byssinosis and all of our provided variables. Note, our choice of significance at 5% might be one of the factors why we have rejected all of our tests. If we were to chance it to 1%, say, then we would actually fail to reject our hypothesis test for the variable race. 
+
+Lastly, from our logistic regression built by BIC stepwise selection, we have seen that the only factor that contributed significantly to byssinosis is the presence of dust. Workspace which are the most dusty contribute more as compared to the other ones. However, as a caveat here, we might have built a model that is not the "most" useful for real world predictions. If we were to build our model using AIC as our variable selection criteria, there is a likely chance that we will have included more variables and build a model that is even better at predicting than the model provided here. For the purposes of this report, we would stick with BIC.  
 
 # 5. Code Appendix
 ```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
