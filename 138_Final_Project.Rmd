@@ -1,11 +1,23 @@
 ---
-title: "STA_138"
-author: "Charles Chien"
+title: "STA_138_Final_Project"
+author: "Edwin Que, Charles Chien"
 date: "12/14/2020"
 output: pdf_document
 ---
 
-# Import & Modifying Dataset
+# 1. Introduction
+
+In 1973, a large cotton textile company in North Carolina participated in a study to investigate the prevalence of byssinosis, a form of pneumoconiosis to which workers exposed to cotton dust are subject. Data was collected on 5,419 workers, including:
+
+Type of work place [1 (most dusty), 2 (less dusty), 3 (least dusty)]
+Employment, years [< 10, 10–19, 20–]
+Smoking [Smoker, or not in last 5 years]
+Sex [Male, Female]
+Race [White, Other]
+Byssinosis [Yes, No]
+
+Our task is to investigate relationships between this disease on the one hand and smoking status, sex, race, length of employment, smoking, and dustiness of workplace on the other.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 #libraries and setseed
@@ -44,62 +56,103 @@ longdataeda$y <- ifelse(longdata$y==1,"Yes","No")
 names(longdataeda)[names(longdataeda) == "y"] <- "Byssinosis"
 ```
 
-# Exploratory Data Analysis
+# 2. Exploratory Data Analysis
 
-## Employment
+Here, we would establish preliminary assumptions on variable effects, and validate them afterwards with proper tests.
+
+## 2.1 Employment
+
+From the plot, it seems like the proportion of having byssinosis is higher for those between 10-19 of employment years.
 ```{r}
 ggplot(longdataeda, aes(x= Employment, fill = Byssinosis)) + geom_bar(position = position_dodge())+
   labs(y= "Number of Workers", x="Employment Years", title = "Distribution of Byssinosis by Employment Years")
 ```
 
+## 2.2 Smoking
 
-
-# Variable Selection
-
-
-## USing Forward BIC
+From the plot, it seems like the proportion of having byssinosis is roughly the same across smokers and non smokers.
 ```{r}
-forward_BIC <- step(glm(response_train~1, binomial, train),
+ggplot(longdataeda, aes(x= Smoking, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Smoking", title = "Distribution of Byssinosis by Smoking")
+```
+
+## 2.3 Sex
+
+From the plot, it seems like the proportion of having byssinosis is roughly the same across males and females.
+```{r}
+ggplot(longdataeda, aes(x= Sex, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Sex", title = "Distribution of Byssinosis by Sex")
+```
+
+## 2.4 Race
+
+From the plot, it seems like the proportion of having byssinosis is higher for other races than white people.
+
+```{r}
+ggplot(longdataeda, aes(x= Race, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Race", title = "Distribution of Byssinosis by Race")
+```
+
+## 2.5 Workspace
+
+From the plot, it seems like the proportion of having byssinosis is the highest where the workspace is the most dusty, followed by less dusty and least dusty.
+
+```{r}
+ggplot(longdataeda, aes(x= Workspace, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Workspace", title = "Distribution of Byssinosis by Workspace")
+```
+
+Overall, from the exploratory data analysis, 3 factors appear to contribute to having Byssinosis, particularly:
+
+1. Employment years between 10-19
+
+2. Non-white race
+
+3. Most dusty workspace
+
+Now, we will build a logistic regression model and evaluate these variables to test our hypothesis and observations. 
+
+# 3. Variable Selection
+
+Here, since our main goal is to build a logistic model focusing on investigating relationships and inference, we choose to use BIC over AIC as our criteria since it is easier for interpretations. AIC is more complicated and is only better if we want a better prediction result. 
+
+## 3.1 USing Forward BIC
+
+```{r}
+forward_BIC <- step(glm(y~1, binomial, train),
      scope = ~Employment*Smoking*Sex*Race*Workspace,
      direction = "forward",
      k = log(dim(train)[1]))
 forward_BIC
 ```
 
-Final Model: formula = response_train ~ Workspace + Smoking + Employment
+*Model selected: y ~ Workspace*
 
-## Using Both BIC
+## 3.2 Using Both BIC
+
 ```{r}
-both_BIC <- step(glm(response_train~1, binomial, train),
+both_BIC <- step(glm(y~1, binomial, train),
      scope = ~Employment*Smoking*Sex*Race*Workspace,
      direction = "both",
      k = log(dim(train)[1]))
-both_BIC
+summary(both_BIC)
 ```
 
-Final Model: response_train ~ Workspace + Smoking + Employment
+*Model selected: y ~ Workspace*
 
+Here, we see that both bidirectional and forward stepwise selection with BIC yielded the same model with Workspace as the only input variable. 
+
+## 3.3 Testing for nonzero coefficients 
 
 ```{r}
-Byssinosis1 <- aggregate(response_test ~ Workspace + Smoking + Employment,FUN = sum, data = test)
-
-fitGrouped <- glm(cbind(V1,V2) ~ Workspace + Smoking + Employment, binomial, Byssinosis1)
-summary(fitGrouped)
-
-1-pchisq(0.63761, 4)
+testFit <- glm(both_BIC$model, binomial, test)
+summary(testFit)
+1-pchisq(608.03, 2706)
 ```
 
-```{r}
-Byssinosis2 <- aggregate(response_test ~ Workspace + Smoking + Employment +Workspace:Smoking + Workspace:Employment + Smoking:Employment,FUN = sum, data = test)
+Using the Wald test with the test dataset, We see that the p values are close to zero, meaning that they are very significant and non zero. To briefly interpret the estimates, the magnitude of the estimates suggest the chance of having Byssinosis decreases less in workspace 1 (most dusty) than in workspaces 2 and 3 (less and least dusty.)
 
-fitGrouped2 <- glm(cbind(V1,V2)~Workspace + Smoking + Employment +Workspace:Smoking + Workspace:Employment + Smoking:Employment, binomial, Byssinosis2)
-summary(fitGrouped2)
-
-1-pchisq(5.1934e-10, 0)
-```
-
-
-
+Additionally, from computing the 
 
 
 
