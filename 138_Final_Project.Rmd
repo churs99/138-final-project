@@ -8,29 +8,49 @@ output: pdf_document
 # Import & Modifying Dataset
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-#import dataset
+#libraries and setseed
 library(readr)
-Byssinosis <- read_csv("Byssinosis.csv")
-Byssinosis$Workspace <- as.factor(Byssinosis$Workspace)
-
 library(ISLR)
 library(ggplot2)
-attach(Byssinosis)
-smp_siz = floor(0.75*nrow(Byssinosis))
+set.seed(123)
 
-set.seed(123)  
-train_ind = sample(seq_len(nrow(Byssinosis)),size = smp_siz)  
-train =Byssinosis[train_ind,] 
-test=Byssinosis[-train_ind,]
+#import dataset
+Byssinosis <- read_csv("Byssinosis.csv")
 
-#create response variable for train
-response_train = cbind(train$Byssinosis, train$`Non-Byssinosis`)
+#turn numerical variable into factor
+Byssinosis$Workspace <- as.factor(Byssinosis$Workspace)
 
-#create response variable for test
-response_test = cbind(test$Byssinosis, test$`Non-Byssinosis`)
+#make long data from wide data
+yes <- Byssinosis$Byssinosis
+no <- Byssinosis$`Non-Byssinosis`
+yesInd <- c(
+  rep(0,sum(no)),
+  rep(1,sum(yes))
+  )
+longdata <- rbind(
+  Byssinosis[rep(1:72,no),1:5],
+  Byssinosis[rep(1:72,yes),1:5]
+)
+longdata$y <- yesInd
+
+#create train and test datasets using 50-50 split on long data
+trainIndex <- sample(5419, 2710)
+train = longdata[trainIndex,] 
+test = longdata[-trainIndex,]
+
+##create "yes","no" response for EDA, change name of column y
+longdataeda <- longdata
+longdataeda$y <- ifelse(longdata$y==1,"Yes","No")
+names(longdataeda)[names(longdataeda) == "y"] <- "Byssinosis"
 ```
-## Exploratory Data Analysis
+
+# Exploratory Data Analysis
+
+## Employment
+```{r}
+ggplot(longdataeda, aes(x= Employment, fill = Byssinosis)) + geom_bar(position = position_dodge())+
+  labs(y= "Number of Workers", x="Employment Years", title = "Distribution of Byssinosis by Employment Years")
+```
 
 
 
